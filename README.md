@@ -21,6 +21,8 @@ https://google.com/home?qs=value
 https://google.com/home?qs=newValue&secondQs=anotherValue
 ```
 
+Why C++? Because it's super fast?!?! No not really, I'm working on my C++ skills and mostly just wanted to create a real-world C++ project as opposed to educational related work.
+
 ## Installation
 Use the binary already compiled within the repository...Or better yet to not run a random binary from myself who can be very shady, compile from source:
 
@@ -66,6 +68,10 @@ Very simple, simply pass URLs from stdin or with the `-u` flag:
 
 `./urldedupe -u urls.txt`
 
-After moving the `urldedupe` binary to your `bin` dir:
+After moving the `urldedupe` binary to your `bin` dir..Pass in list from stdin and save to a file:
 
-`cat urls.txt | urldedupe`
+`cat urls.txt | urldedupe > deduped_urls.txt`
+
+For all the bug bounty hunters, I recommend chaining with tools such as `waybackurls` or `gau` to get back only unique URLs as those sources are prone to have many similar/duplicated URLs:
+
+`cat waybackurls | urldedupe > deduped_urls.txt`
