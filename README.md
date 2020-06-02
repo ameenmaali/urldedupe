@@ -28,6 +28,12 @@ Use the binary already compiled within the repository...Or better yet to not run
 
 You'll need `cmake` installed and C++ 17 or higher.
 
+Clone the repository & navigate to it:
+```
+git clone https://github.com/ameenmaali/urldedupe.git
+cd urldedupe
+```
+
 In the `urldedupe` directory
 ```
 cmake CMakeLists.txt
