@@ -20,8 +20,8 @@ int main(int argc, char **argv) {
     std::vector<std::string> urls {};
     std::string url {};
 
-    bool url_file_provided {false};
-    for (Option &option: options)
+    bool url_file_provided, regex_mode {false};
+    for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
         {
@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
             url_file_provided = true;
             load_urls_from_file(urls, option.value);
         }
+
+        regex_mode = option.flag.short_name == "-r";
     }
 
     if (!url_file_provided)
@@ -52,16 +54,16 @@ int main(int argc, char **argv) {
 
     std::unordered_map<std::string, bool> deduped_url_keys;
     std::vector<Url> deduped_urls {};
-    for (std::string &u: urls)
+    for (const std::string &u: urls)
     {
-        Url parsed_url(u);
+        Url parsed_url(u, regex_mode);
 
-        // Decode URLs before assessing and keep tracking of number of decodes to re-encode after comparison
-        int decode_count {0};
-        while (Url::is_encoded(parsed_url.get_url_string()) && decode_count < 5)
+        // Decode URLs before assessing
+        bool was_encoded {false};
+        if (Url::is_encoded(parsed_url.get_url_string()))
         {
             parsed_url.set_url_string(parsed_url.decode());
-            decode_count++;
+            was_encoded = true;
         }
 
         std::string url_key {parsed_url.get_url_key()};
@@ -73,14 +75,15 @@ int main(int argc, char **argv) {
         deduped_url_keys.insert(std::make_pair(url_key, true));
 
         // Re-encode back to original value after dupe check
-        for (int i {0}; i < decode_count; i++)
+        if (was_encoded)
         {
             parsed_url.set_url_string(parsed_url.encode());
         }
+
         deduped_urls.push_back(parsed_url);
     }
 
-    for (Url &u: deduped_urls)
+    for (const Url &u: deduped_urls)
     {
         std::cout << u.get_url_string() << std::endl;
     }

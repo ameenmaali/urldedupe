@@ -5,10 +5,15 @@
 #include <regex>
 #include "Url.hpp"
 
-Url::Url(std::string &url)
+Url::Url(const std::string &url, bool regex_mode)
 {
     url_string = url;
-    this->parse();
+    if (regex_mode)
+    {
+        this->regex_parse();
+    } else {
+        this->parse();
+    }
 }
 
 const std::string &Url::get_scheme() const
@@ -141,15 +146,13 @@ std::string Url::encode()
     return encoded_str;
 }
 
-Url Url::parse()
+void Url::regex_parse()
 {
     // Decode URLs before parsing
-    int decode_count {0};
     std::string decoded_url {this->url_string};
-    while (Url::is_encoded(decoded_url) && decode_count < 5)
+    if (Url::is_encoded(decoded_url))
     {
         decoded_url = this->decode();
-        decode_count++;
     }
 
     std::string parsed_scheme, parsed_hostname, parsed_path, parsed_query_strings, parsed_fragment {};
@@ -169,8 +172,69 @@ Url Url::parse()
     this->set_path(parsed_path);
     this->set_query_strings(parsed_query_strings);
     this->set_fragment(parsed_fragment);
+}
 
-    return *this;
+bool Url::parse()
+{
+    // Decode URLs before parsing
+    std::string decoded_url {this->url_string};
+    if (Url::is_encoded(decoded_url))
+    {
+        decoded_url = this->decode();
+    }
+
+    std::string parsed_scheme, parsed_hostname, parsed_path, parsed_query_strings, parsed_fragment {};
+
+    size_t current {decoded_url.find("://")};
+    if (current == std::string::npos)
+    {
+        return false;
+    }
+
+    std::string token {decoded_url.substr(0, current)};
+    parsed_scheme = token + "://";
+
+    // Erase the scheme and :// from the current string
+    decoded_url.erase(0, current + 3);
+
+    current = decoded_url.find('/');
+    // If trailing slash not found, add it
+    decoded_url = current == std::string::npos ? decoded_url + '/' : decoded_url;
+    current = decoded_url.find('/');
+
+    token = decoded_url.substr(0, current);
+    parsed_hostname = token;
+    decoded_url.erase(0, parsed_hostname.length());
+
+    current = decoded_url.find('#');
+    if (current != std::string::npos)
+    {
+        token = decoded_url.substr(current + 1, std::string::npos);
+        parsed_fragment = token;
+        decoded_url.erase(current, std::string::npos);
+    }
+
+    current = decoded_url.find('?');
+    if (current != std::string::npos)
+    {
+        token = decoded_url.substr(0, current);
+        parsed_path = token;
+        decoded_url.erase(0, current + 1);
+    } else {
+        parsed_path = decoded_url;
+        decoded_url.erase(0, current);
+    }
+
+    if (!decoded_url.empty())
+    {
+        parsed_query_strings = decoded_url;
+    }
+
+    this->set_hostname(parsed_hostname);
+    this->set_path(parsed_path);
+    this->set_query_strings(parsed_query_strings);
+    this->set_fragment(parsed_fragment);
+    return true;
 }
 
 std::string Url::get_url_key()
@@ -198,7 +262,7 @@ std::string Url::get_url_key()
     }
 
     url_key += "?";
-    for (auto &x: qs_vals) {
+    for (const auto &x: qs_vals) {
         url_key += x + "&";
     }
 

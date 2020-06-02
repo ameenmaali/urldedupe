@@ -60,6 +60,7 @@ $ ./urldedupe -h
 (-h|--help) - Usage/help info for urldedupe
 (-u|--urls) - Filename containing urls (use this if you don't pipe urls via stdin)
 (-V|--version) - Get current version for urldedupe
+(-r|--regex-parse) - This is significantly slower than normal parsing, but may be more thorough or accurate
 ```
 
 ## Examples
@@ -75,3 +76,7 @@ After moving the `urldedupe` binary to your `bin` dir..Pass in list from stdin a
 For all the bug bounty hunters, I recommend chaining with tools such as `waybackurls` or `gau` to get back only unique URLs as those sources are prone to have many similar/duplicated URLs:
 
 `cat waybackurls | urldedupe > deduped_urls.txt`
+
+For max thoroughness (usually not necessary), you can use an RFC complaint regex for URL parsing, but it is significantly slower for large data sets:
+
+`cat urls.txt | urldedupe -r > deduped_urls_regex.txt`

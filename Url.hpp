@@ -20,7 +20,7 @@ private:
     std::string query_strings;
     std::string fragment;
 public:
-    Url(std::string &url);
+    Url(const std::string &url, bool regex_mode = false);
     ~Url() = default;
 
     const std::string &get_scheme() const;
@@ -45,7 +45,8 @@ public:
 
     const std::string &get_url_string() const;
 
-    Url parse();
+    void regex_parse();
+    bool parse();
 
     std::string get_url_key();
 
