@@ -38,7 +38,7 @@ public:
     const std::string &get_fragment() const;
     void set_fragment(const std::string &fragment);
 
-    bool is_encoded();
+    static bool is_encoded(const std::string &u);
 
     std::string decode();
     std::string encode();
@@ -49,6 +49,7 @@ public:
 
     std::string get_url_key();
 
+    void set_url_string(const std::string &url_string);
 };
 
 #endif //URLDEDUPE_URL_HPP

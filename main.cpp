@@ -56,6 +56,14 @@ int main(int argc, char **argv) {
     {
         Url parsed_url(u);
 
+        // Decode URLs before assessing and keep tracking of number of decodes to re-encode after comparison
+        int decode_count {0};
+        while (Url::is_encoded(parsed_url.get_url_string()) && decode_count < 5)
+        {
+            parsed_url.set_url_string(parsed_url.decode());
+            decode_count++;
+        }
+
         std::string url_key {parsed_url.get_url_key()};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
         {
@@ -63,6 +71,12 @@ int main(int argc, char **argv) {
         }
 
         deduped_url_keys.insert(std::make_pair(url_key, true));
+
+        // Re-encode back to original value after dupe check
+        for (int i {0}; i < decode_count; i++)
+        {
+            parsed_url.set_url_string(parsed_url.encode());
+        }
         deduped_urls.push_back(parsed_url);
     }
 

@@ -61,28 +61,101 @@ void Url::set_fragment(const std::string &fragment)
     Url::fragment = fragment;
 }
 
-bool Url::is_encoded()
-{
-    return this->url_string.find('%') != 0;
+const std::string &Url::get_url_string() const {
+    return url_string;
+}
+
+void Url::set_url_string(const std::string &url_string) {
+    Url::url_string = url_string;
+}
+
+bool Url::is_encoded(const std::string &u) {
+    return u.find('%') != std::string::npos;
 }
 
 std::string Url::decode()
 {
-    return std::string();
+    std::string ret;
+    char ch;
+    int i, ii, len = this->url_string.length();
+
+    for (i=0; i < len; i++)
+    {
+        if (this->url_string[i] != '%')
+        {
+            if(this->url_string[i] == '+')
+            {
+                ret += ' ';
+            }
+            else {
+                ret += this->url_string[i];
+            }
+        } else {
+            sscanf(this->url_string.substr(i + 1, 2).c_str(), "%x", &ii);
+            ch = static_cast<char>(ii);
+            ret += ch;
+            i = i + 2;
+        }
+    }
+    return ret;
 }
 
 std::string Url::encode()
 {
-    return std::string();
+    std::string encoded_str {};
+    char c;
+    int ic;
+    const char* chars = this->url_string.c_str();
+    char bufHex[10];
+    int len = strlen(chars);
+
+    for (int i=0; i<len; i++)
+    {
+        c = chars[i];
+        ic = c;
+
+        if (c == ' ')
+        {
+            encoded_str += '+';
+        }
+        else {
+            if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+            {
+                encoded_str += c;
+            }
+            else {
+                sprintf(bufHex, "%X", c);
+
+                if(ic < 16)
+                {
+                    encoded_str += "%0";
+                }
+                else
+                {
+                    encoded_str += "%";
+                }
+                encoded_str += bufHex;
+            }
+        }
+    }
+    return encoded_str;
 }
 
 Url Url::parse()
 {
+    // Decode URLs before parsing
+    int decode_count {0};
+    std::string decoded_url {this->url_string};
+    while (Url::is_encoded(decoded_url) && decode_count < 5)
+    {
+        decoded_url = this->decode();
+        decode_count++;
+    }
+
     std::string parsed_scheme, parsed_hostname, parsed_path, parsed_query_strings, parsed_fragment {};
 
     std::smatch match;
-
-    if (std::regex_match(this->url_string, match, URL_REGEX))
+    if (std::regex_match(decoded_url, match, URL_REGEX))
     {
         parsed_scheme = match[2].str() + "://";
         parsed_hostname = match[4];
@@ -107,13 +180,6 @@ std::string Url::get_url_key()
     std::string url_key {};
     url_key += this->hostname + this->path;
 
-    int decode_count {0};
-    while (this->is_encoded() && decode_count <= 5)
-    {
-        this->decode();
-        decode_count++;
-    }
-
     std::string qs {get_query_strings()};
     if (qs.empty()) {
         return url_key;
@@ -137,8 +203,4 @@ std::string Url::get_url_key()
     }
 
     return url_key;
-}
-
-const std::string &Url::get_url_string() const {
-    return url_string;
 }
