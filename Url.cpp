@@ -4,6 +4,7 @@
 
 #include <regex>
 #include "Url.hpp"
+#include "utils.hpp"
 
 Url::Url(const std::string &url, bool regex_mode)
 {
@@ -82,7 +83,7 @@ std::string Url::decode()
 {
     std::string ret;
     char ch;
-    int i, ii, len = this->url_string.length();
+    int i, len = this->url_string.length();
 
     for (i=0; i < len; i++)
     {
@@ -96,8 +97,9 @@ std::string Url::decode()
                 ret += this->url_string[i];
             }
         } else {
-            sscanf(this->url_string.substr(i + 1, 2).c_str(), "%x", &ii);
-            ch = static_cast<char>(ii);
+            // If url_string[i+2] does not exist, this will crash.
+            // This also means the URL is invalid, so...
+            ch = hex_digit(url_string[i+1])*16 + hex_digit(url_string[i+2]);
             ret += ch;
             i = i + 2;
         }
