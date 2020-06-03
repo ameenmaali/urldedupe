@@ -19,7 +19,10 @@ bool load_urls_from_file(std::vector<std::string> &urls, const std::string &file
     std::string url;
     while (file.good()) {
         getline(file, url);
-        urls.push_back(url);
+        if (!url.empty())
+        {
+            urls.push_back(url);
+        }
     }
     file.close();
 

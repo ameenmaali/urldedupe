@@ -7,7 +7,7 @@
 #include "utils.hpp"
 #include "Url.hpp"
 
-const std::string VERSION {"1.0.1"};
+const std::string VERSION {"1.0.2"};
 
 int main(int argc, char **argv) {
     // Parse flags if provided
@@ -80,12 +80,8 @@ int main(int argc, char **argv) {
             parsed_url.set_url_string(parsed_url.encode());
         }
 
-        deduped_urls.push_back(parsed_url);
-    }
-
-    for (const Url &u: deduped_urls)
-    {
-        std::cout << u.get_url_string() << std::endl;
+        // If it has made it to this point, it's a non-duplicate URL. Print it
+        std::cout << parsed_url.get_url_string() << std::endl;
     }
 
     return 0;
