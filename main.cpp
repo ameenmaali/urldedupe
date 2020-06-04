@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
         regex_mode = option.flag.short_name == "-r";
     }
 
-    if (filename.length() == 0) {
+    if (filename.length() > 0) {
         load_urls_from_file(urls, filename, regex_mode);
     }
     else {
