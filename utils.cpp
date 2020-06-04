@@ -8,23 +8,26 @@
 #include <fstream>
 #include "utils.hpp"
 
-bool load_urls_from_file(std::vector<std::string> &urls, const std::string &filename)
+#include "Url.hpp"
+
+
+bool load_urls_from_file(std::vector<Url> &urls, const std::string &filename, bool regex_mode) 
 {
     std::ifstream file (filename);
-    if (!file.is_open()) {
+    if (!file) {
         std::cout << "Unable to open file " << filename << std::endl;
         return false;
     }
-
-    std::string url;
-    while (file.good()) {
-        getline(file, url);
-        if (!url.empty())
-        {
-            urls.push_back(url);
-        }
+    else {
+        read_urls_from_stream(urls, file, regex_mode);
+        return true;
     }
-    file.close();
+}
 
-    return true;
+void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_mode) 
+{
+    std::string s;
+    while(getline(is, s)){
+        urls.emplace_back(s, regex_mode);
+    }
 }
