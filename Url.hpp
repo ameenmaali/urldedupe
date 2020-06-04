@@ -13,7 +13,7 @@ const std::regex URL_REGEX (R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*)
 
 class Url {
 private:
-    std::string url_string;
+    const std::string url_string;
     std::string scheme;
     std::string hostname;
     std::string path;
@@ -49,8 +49,6 @@ public:
     bool parse();
 
     std::string get_url_key();
-
-    void set_url_string(const std::string &url_string);
 };
 
 #endif //URLDEDUPE_URL_HPP

@@ -58,14 +58,6 @@ int main(int argc, char **argv) {
     {
         Url parsed_url(u, regex_mode);
 
-        // Decode URLs before assessing
-        bool was_encoded {false};
-        if (Url::is_encoded(parsed_url.get_url_string()))
-        {
-            parsed_url.set_url_string(parsed_url.decode());
-            was_encoded = true;
-        }
-
         std::string url_key {parsed_url.get_url_key()};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
         {
@@ -73,12 +65,6 @@ int main(int argc, char **argv) {
         }
 
         deduped_url_keys.insert(std::make_pair(url_key, true));
-
-        // Re-encode back to original value after dupe check
-        if (was_encoded)
-        {
-            parsed_url.set_url_string(parsed_url.encode());
-        }
 
         // If it has made it to this point, it's a non-duplicate URL. Print it
         std::cout << parsed_url.get_url_string() << std::endl;

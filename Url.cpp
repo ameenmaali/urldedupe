@@ -7,8 +7,8 @@
 #include "utils.hpp"
 
 Url::Url(const std::string &url, bool regex_mode)
+    : url_string(url)
 {
-    url_string = url;
     if (regex_mode)
     {
         this->regex_parse();
@@ -69,10 +69,6 @@ void Url::set_fragment(const std::string &fragment)
 
 const std::string &Url::get_url_string() const {
     return url_string;
-}
-
-void Url::set_url_string(const std::string &url_string) {
-    Url::url_string = url_string;
 }
 
 bool Url::is_encoded(const std::string &u) {
