@@ -8,7 +8,11 @@
 #include <string>
 #include <vector>
 
-bool load_urls_from_file(std::vector<std::string> &urls, const std::string &filename);
+class Url;
+
+bool load_urls_from_file(std::vector<Url> &urls, const std::string &filename, bool regex_mode);
+
+void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_mode);
 
 inline char hex_digit(char c) {
     if('0' <= c and c <= '9') return (c - '0');

@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
         options = parse_flags(argc, argv);
     }
 
-    std::vector<std::string> urls {};
-    std::string url {};
+    std::vector<Url> urls {};
+    std::string filename {};
 
-    bool url_file_provided, regex_mode {false};
+    bool regex_mode {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -37,28 +37,24 @@ int main(int argc, char **argv) {
 
         if (option.flag.short_name == "-u")
         {
-            url_file_provided = true;
-            load_urls_from_file(urls, option.value);
+            filename = option.value;
         }
 
         if(option.flag.short_name == "-r")
             regex_mode = true;
     }
 
-    if (!url_file_provided)
-    {
-        while (getline(std::cin, url))
-        {
-            urls.push_back(url);
-        }
+    if (filename.length() > 0) {
+        load_urls_from_file(urls, filename, regex_mode);
+    }
+    else {
+        read_urls_from_stream(urls, std::cin, regex_mode);
     }
 
     std::unordered_map<std::string, bool> deduped_url_keys;
     std::vector<Url> deduped_urls {};
-    for (const std::string &u: urls)
+    for (auto &parsed_url: urls)
     {
-        Url parsed_url(u, regex_mode);
-
         std::string url_key {parsed_url.get_url_key()};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
         {
