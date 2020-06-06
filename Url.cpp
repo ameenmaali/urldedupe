@@ -71,6 +71,10 @@ const std::string &Url::get_url_string() const {
     return url_string;
 }
 
+bool Url::is_encoded(const std::string &u) {
+    return u.find('%') != std::string::npos;
+}
+
 std::string Url::decode(const std::string& str)
 {
     std::string ret;
@@ -96,6 +100,44 @@ std::string Url::decode(const std::string& str)
     }
     return ret;
 }
+
+std::string Url::encode(const std::string& str)
+{
+    std::string encoded_str {};
+    char bufHex[10];
+    const int len = str.length();
+
+    for (int i=0; i<len; i++)
+    {
+        auto c = str[i];
+
+        if (c == ' ')
+        {
+            encoded_str += '+';
+        }
+        else {
+            if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+            {
+                encoded_str += c;
+            }
+            else {
+                sprintf(bufHex, "%X", c);
+
+                if(static_cast<int>(c) < 16)
+                {
+                    encoded_str += "%0";
+                }
+                else
+                {
+                    encoded_str += "%";
+                }
+                encoded_str += bufHex;
+            }
+        }
+    }
+    return encoded_str;
+}
+
 
 void Url::regex_parse()
 {
