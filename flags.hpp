@@ -20,7 +20,6 @@ struct Option {
     std::string value;
 };
 
-std::vector<Flag> get_flags();
 std::vector<Option> parse_flags(int argc, char **argv);
 void print_version(const std::string &version);
 void print_usage();
