@@ -71,174 +71,85 @@ const std::string &Url::get_url_string() const {
     return url_string;
 }
 
-bool Url::is_encoded(const std::string &u) {
-    return u.find('%') != std::string::npos;
-}
-
-std::string Url::decode()
+std::string Url::decode(const std::string& str)
 {
     std::string ret;
-    char ch;
-    int i, len = this->url_string.length();
+    auto len = str.length();
 
-    for (i=0; i < len; i++)
+    for (std::size_t i=0; i < len; i++)
     {
-        if (this->url_string[i] != '%')
+        if (str[i] != '%')
         {
-            if(this->url_string[i] == '+')
+            if(str[i] == '+')
             {
                 ret += ' ';
             }
             else {
-                ret += this->url_string[i];
+                ret += str[i];
             }
         } else {
-            // If url_string[i+2] does not exist, this will crash.
+            // If str[i+2] does not exist, this will crash.
             // This also means the URL is invalid, so...
-            ch = hex_digit(url_string[i+1])*16 + hex_digit(url_string[i+2]);
-            ret += ch;
+            ret += hex_digit(str[i+1])*16 + hex_digit(str[i+2]);
             i = i + 2;
         }
     }
     return ret;
 }
 
-std::string Url::encode()
-{
-    std::string encoded_str {};
-    char c;
-    int ic;
-    const char* chars = this->url_string.c_str();
-    char bufHex[10];
-    int len = strlen(chars);
-
-    for (int i=0; i<len; i++)
-    {
-        c = chars[i];
-        ic = c;
-
-        if (c == ' ')
-        {
-            encoded_str += '+';
-        }
-        else {
-            if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
-            {
-                encoded_str += c;
-            }
-            else {
-                sprintf(bufHex, "%X", c);
-
-                if(ic < 16)
-                {
-                    encoded_str += "%0";
-                }
-                else
-                {
-                    encoded_str += "%";
-                }
-                encoded_str += bufHex;
-            }
-        }
-    }
-    return encoded_str;
-}
-
 void Url::regex_parse()
 {
-    // Decode URLs before parsing
-    std::string decoded_url {this->url_string};
-    if (Url::is_encoded(decoded_url))
-    {
-        decoded_url = this->decode();
-    }
-
-    std::string parsed_scheme, parsed_hostname, parsed_path, parsed_query_strings, parsed_fragment {};
-
     std::smatch match;
-    if (std::regex_match(decoded_url, match, URL_REGEX))
+    if (std::regex_match(url_string, match, URL_REGEX))
     {
-        parsed_scheme = match[2].str() + "://";
-        parsed_hostname = match[4];
-        parsed_path = match[5];
-        parsed_query_strings = match[7];
-        parsed_fragment = match[9];
+        scheme = match[2].str() + "://";
+        hostname = match[4];
+        path = match[5];
+        query_strings = match[7];
+        fragment = match[9];
     }
-
-    this->set_scheme(parsed_scheme);
-    this->set_hostname(parsed_hostname);
-    this->set_path(parsed_path);
-    this->set_query_strings(parsed_query_strings);
-    this->set_fragment(parsed_fragment);
 }
 
 bool Url::parse()
 {
-    // Decode URLs before parsing
-    std::string decoded_url {this->url_string};
-    if (Url::is_encoded(decoded_url))
-    {
-        decoded_url = this->decode();
-    }
+    std::string_view url_view {url_string};
 
-    std::string parsed_scheme, parsed_hostname, parsed_path, parsed_query_strings, parsed_fragment {};
-
-    size_t current {decoded_url.find("://")};
-    if (current == std::string::npos)
-    {
-        return false;
-    }
-
-    std::string token {decoded_url.substr(0, current)};
-    parsed_scheme = token + "://";
-
-    // Erase the scheme and :// from the current string
-    decoded_url.erase(0, current + 3);
-
-    current = decoded_url.find('/');
-    // If trailing slash not found, add it
-    decoded_url = current == std::string::npos ? decoded_url + '/' : decoded_url;
-    current = decoded_url.find('/');
-
-    token = decoded_url.substr(0, current);
-    parsed_hostname = token;
-    decoded_url.erase(0, parsed_hostname.length());
-
-    current = decoded_url.find('#');
+    auto current {url_view.find("://")};
     if (current != std::string::npos)
     {
-        token = decoded_url.substr(current + 1, std::string::npos);
-        parsed_fragment = token;
-        decoded_url.erase(current, std::string::npos);
+        scheme = url_view.substr(0, current+3);
+        url_view = url_view.substr(current+3);
     }
 
-    current = decoded_url.find('?');
+
+    current = url_view.find('#');
     if (current != std::string::npos)
     {
-        token = decoded_url.substr(0, current);
-        parsed_path = token;
-        decoded_url.erase(0, current + 1);
-    } else {
-        parsed_path = decoded_url;
-        decoded_url.erase(0, current);
+        fragment = url_view.substr(current+1);
+        url_view = url_view.substr(0,current);
     }
 
-    if (!decoded_url.empty())
+
+    current = url_view.find('?');
+    if (current != std::string::npos)
     {
-        parsed_query_strings = decoded_url;
+        query_strings = url_view.substr(current+1);
+        url_view = url_view.substr(0,current);
     }
 
-    this->set_hostname(parsed_hostname);
-    this->set_path(parsed_path);
-    this->set_query_strings(parsed_query_strings);
-    this->set_fragment(parsed_fragment);
+
+    current = url_view.find('/');
+    if (current != std::string::npos)
+    {
+        path = url_view.substr(current);
+    }
+    hostname = url_view.substr(0,current);
+
     return true;
 }
 
 std::string Url::get_url_key()
 {
-    // Decode until all % are gone. If still there after 5 decodes, it most likely indicates
-    // a malformed URL and will move on at that point.
     std::string url_key {};
     url_key += this->hostname + this->path;
 

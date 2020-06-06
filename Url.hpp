@@ -38,10 +38,7 @@ public:
     const std::string &get_fragment() const;
     void set_fragment(const std::string &fragment);
 
-    static bool is_encoded(const std::string &u);
-
-    std::string decode();
-    std::string encode();
+    static std::string decode(const std::string&);
 
     const std::string &get_url_string() const;
 
