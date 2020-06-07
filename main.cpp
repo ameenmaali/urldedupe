@@ -7,7 +7,7 @@
 #include "utils.hpp"
 #include "Url.hpp"
 
-const std::string VERSION {"1.0.2"};
+const std::string VERSION {"1.0.3"};
 
 int main(int argc, char **argv) {
     // Parse flags if provided
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     std::vector<Url> urls {};
     std::string filename {};
 
-    bool regex_mode, silent_mode {false};
+    bool regex_mode, similar_mode {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
             regex_mode = true;
 
         if (option.flag.short_name == "-s")
-            silent_mode = true;
+            similar_mode = true;
     }
 
     if (filename.length() > 0) {
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
     std::unordered_map<std::string, bool> deduped_url_keys;
     for (auto &parsed_url: urls)
     {
-        std::string url_key {parsed_url.get_url_key(silent_mode)};
+        std::string url_key {parsed_url.get_url_key(similar_mode)};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
             continue;
 

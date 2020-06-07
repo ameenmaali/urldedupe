@@ -240,12 +240,14 @@ std::string Url::get_path_components() const
         token = url_path.substr(0, current);
         url_path.erase(0, current + 1);
 
+        // Append to path_components depending on what time of component is found
+        // Also, add back trailing slash to separate components
         if (is_number(token))
-            path_components += "int";
+            path_components += "int/";
         else if (is_image(token))
-            path_components += "image";
+            path_components += "image/";
         else
-            path_components += token;
+            path_components += token + "/";
     }
 
     return path_components;

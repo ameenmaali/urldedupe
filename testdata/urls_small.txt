@@ -20,3 +20,5 @@ https://site.com/photos/photo.jpeg
 https://site.com/photos/123.png
 https://site.com/photos/123.png?img=true
 http://go.com/home?qs=value#fragment=123
+https://go.com/a/b/c
+https://go.com/abc
