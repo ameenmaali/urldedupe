@@ -7,9 +7,10 @@
 #include "utils.hpp"
 #include "Url.hpp"
 
-const std::string VERSION {"1.0.2"};
+const std::string VERSION {"1.0.3"};
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     // Parse flags if provided
     std::vector<Option> options;
     if (argc > 1)
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
     std::vector<Url> urls {};
     std::string filename {};
 
-    bool regex_mode {false};
+    bool regex_mode, similar_mode {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -36,12 +37,13 @@ int main(int argc, char **argv) {
         }
 
         if (option.flag.short_name == "-u")
-        {
             filename = option.value;
-        }
 
-        if(option.flag.short_name == "-r")
+        if (option.flag.short_name == "-r")
             regex_mode = true;
+
+        if (option.flag.short_name == "-s")
+            similar_mode = true;
     }
 
     if (filename.length() > 0) {
@@ -52,14 +54,11 @@ int main(int argc, char **argv) {
     }
 
     std::unordered_map<std::string, bool> deduped_url_keys;
-    std::vector<Url> deduped_urls {};
     for (auto &parsed_url: urls)
     {
-        std::string url_key {parsed_url.get_url_key()};
+        std::string url_key {parsed_url.get_url_key(similar_mode)};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
-        {
             continue;
-        }
 
         deduped_url_keys.insert(std::make_pair(url_key, true));
 

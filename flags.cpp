@@ -9,9 +9,9 @@
 #include "flags.hpp"
 
 // clang-format off
-const auto flags = std::array{
+const auto flags = std::array {
     Flag{
-        .short_name="-h", 
+        .short_name="-h",
         .long_name="--help", 
         .usage="Usage/help info for urldedupe", 
         .required=false, 
@@ -33,6 +33,12 @@ const auto flags = std::array{
         .long_name="--regex-parse", 
         .usage="This is significantly slower than normal parsing, but may be more thorough or accurate", 
         .required=false, 
+        .is_switch=true },
+    Flag{
+        .short_name="-s",
+        .long_name="--similar",
+        .usage="Remove similar URLs (based on integers and image/font files) - i.e. /api/user/1 & /api/user/2 deduplicated",
+        .required=false,
         .is_switch=true }
 };
 // clang-format on
@@ -71,7 +77,7 @@ std::vector<Option> parse_flags(int argc, char **argv)
 
 void print_version(const std::string &version)
 {
-    std::cout << "Current urldupe version is " << version << std::endl;
+    std::cout << "Current urldedupe version is " << version << std::endl;
 }
 
 void print_usage()

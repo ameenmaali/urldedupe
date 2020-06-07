@@ -67,11 +67,13 @@ void Url::set_fragment(const std::string &fragment)
     Url::fragment = fragment;
 }
 
-const std::string &Url::get_url_string() const {
+const std::string &Url::get_url_string() const
+{
     return url_string;
 }
 
-bool Url::is_encoded(const std::string &u) {
+bool Url::is_encoded(const std::string &u)
+{
     return u.find('%') != std::string::npos;
 }
 
@@ -190,21 +192,26 @@ bool Url::parse()
     return true;
 }
 
-std::string Url::get_url_key()
+std::string Url::get_url_key(bool similar_mode)
 {
     std::string url_key {};
-    url_key += this->hostname + this->path;
-
-    std::string qs {get_query_strings()};
-    if (qs.empty()) {
-        return url_key;
+    if (similar_mode)
+    {
+        url_key += this->hostname + this->get_path_components();
+    } else {
+        url_key += this->hostname + this->path;
     }
 
+    std::string qs {get_query_strings()};
+    if (qs.empty())
+        return url_key;
+
     std::string token {};
-    size_t current {};
+    size_t current;
     std::vector<std::string> qs_vals {};
     qs += "&";
-    while ((current = qs.find('&')) != std::string::npos) {
+    while ((current = qs.find('&')) != std::string::npos)
+    {
         token = qs.substr(0, current);
         qs.erase(0, current + 1);
 
@@ -213,9 +220,49 @@ std::string Url::get_url_key()
     }
 
     url_key += "?";
-    for (const auto &x: qs_vals) {
+    for (const auto &x: qs_vals)
         url_key += x + "&";
-    }
 
     return url_key;
+}
+
+std::string Url::get_path_components() const
+{
+    std::string path_components {};
+    if (this->path.empty())
+        return path_components;
+
+    std::string url_path {this->path};
+    std::string token {};
+    size_t current;
+
+    // Add trailing slash to get all path components (including last)
+    url_path += "/";
+    while ((current = url_path.find('/')) != std::string::npos)
+    {
+        token = url_path.substr(0, current);
+        url_path.erase(0, current + 1);
+
+        // Append to path_components depending on what time of component is found
+        // Also, add back trailing slash to separate components
+        if (is_number(token))
+            path_components += "int/";
+        else if (is_image(token))
+            path_components += "image/";
+        else
+            path_components += token + "/";
+    }
+
+    return path_components;
+}
+
+bool Url::is_image(const std::string &str)
+{
+    size_t current;
+    current = str.find('.');
+    if (current == std::string::npos)
+         return false;
+
+    std::string extension = str.substr(current, std::string::npos);
+    return find(ASSET_EXTENSIONS.begin(), ASSET_EXTENSIONS.end(), extension) != ASSET_EXTENSIONS.end();
 }
