@@ -23,9 +23,8 @@ https://google.com/home?qs=newValue&secondQs=anotherValue
 
 It's also possible to deduplicate similar URLs. This is done with `-s|--similar` flag, to deduplicate endpoints such as API endpoints with different IDs, or assets:
 
-`cat urls.txt | urldedupe -s`
-
 ```
+$ cat urls.txt
 https://site.com/api/users/123
 https://site.com/api/users/222
 https://site.com/api/users/412/profile
@@ -37,6 +36,7 @@ https://site.com/users/photos/photo.png
 Becomes:
 
 ```
+$ cat urls.txt | urldedupe -s
 https://site.com/api/users/123
 https://site.com/api/users/412/profile
 https://site.com/users/photos/photo.jpg
