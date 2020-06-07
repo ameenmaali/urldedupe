@@ -7,9 +7,14 @@
 
 #include <string>
 #include <regex>
+#include <array>
 
 //RFC 3986 Recommendation for URL Regex: https://tools.ietf.org/html/rfc3986#page-51
 const std::regex URL_REGEX (R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)", std::regex::extended);
+const std::array ASSET_EXTENSIONS {
+    ".jpg", ".jpeg", ".png", ".gif", ".tiff",
+    ".webm", ".svg", ".eot", ".ttf", ".woff"
+};
 
 class Url {
 private:
@@ -42,12 +47,16 @@ public:
     static std::string decode(const std::string&);
     static std::string encode(const std::string&);
 
+    static bool is_image(const std::string &str);
+
     const std::string &get_url_string() const;
 
     void regex_parse();
     bool parse();
 
-    std::string get_url_key();
+    std::string get_url_key(bool similar_mode);
+
+    std::string get_path_components() const;
 };
 
 #endif //URLDEDUPE_URL_HPP
