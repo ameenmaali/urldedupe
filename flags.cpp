@@ -9,7 +9,7 @@
 #include "flags.hpp"
 
 // clang-format off
-const auto flags = std::array{
+const auto flags = std::array {
     Flag{
         .short_name="-h",
         .long_name="--help", 

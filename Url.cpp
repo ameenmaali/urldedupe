@@ -67,11 +67,13 @@ void Url::set_fragment(const std::string &fragment)
     Url::fragment = fragment;
 }
 
-const std::string &Url::get_url_string() const {
+const std::string &Url::get_url_string() const
+{
     return url_string;
 }
 
-bool Url::is_encoded(const std::string &u) {
+bool Url::is_encoded(const std::string &u)
+{
     return u.find('%') != std::string::npos;
 }
 
@@ -201,15 +203,15 @@ std::string Url::get_url_key(bool similar_mode)
     }
 
     std::string qs {get_query_strings()};
-    if (qs.empty()) {
+    if (qs.empty())
         return url_key;
-    }
 
     std::string token {};
     size_t current;
     std::vector<std::string> qs_vals {};
     qs += "&";
-    while ((current = qs.find('&')) != std::string::npos) {
+    while ((current = qs.find('&')) != std::string::npos)
+    {
         token = qs.substr(0, current);
         qs.erase(0, current + 1);
 
@@ -218,9 +220,9 @@ std::string Url::get_url_key(bool similar_mode)
     }
 
     url_key += "?";
-    for (const auto &x: qs_vals) {
+    for (const auto &x: qs_vals)
         url_key += x + "&";
-    }
+
     return url_key;
 }
 
@@ -236,7 +238,8 @@ std::string Url::get_path_components() const
 
     // Add trailing slash to get all path components (including last)
     url_path += "/";
-    while ((current = url_path.find('/')) != std::string::npos) {
+    while ((current = url_path.find('/')) != std::string::npos)
+    {
         token = url_path.substr(0, current);
         url_path.erase(0, current + 1);
 

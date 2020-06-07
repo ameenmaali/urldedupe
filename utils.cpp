@@ -32,6 +32,7 @@ void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_
     }
 }
 
-bool is_number(const std::string &str) {
+bool is_number(const std::string &str)
+{
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
 }

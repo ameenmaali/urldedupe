@@ -9,7 +9,8 @@
 
 const std::string VERSION {"1.0.3"};
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     // Parse flags if provided
     std::vector<Option> options;
     if (argc > 1)
