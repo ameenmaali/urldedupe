@@ -21,6 +21,27 @@ https://google.com/home?qs=value
 https://google.com/home?qs=newValue&secondQs=anotherValue
 ```
 
+It's also possible to deduplicate similar URLs. This is done with `-s|--similar` flag, to deduplicate endpoints such as API endpoints with different IDs, or assets:
+
+`cat urls.txt | urldedupe -s`
+
+```
+https://site.com/api/users/123
+https://site.com/api/users/222
+https://site.com/api/users/412/profile
+https://site.com/users/photos/photo.jpg
+https://site.com/users/photos/myPhoto.jpg
+https://site.com/users/photos/photo.png
+```
+
+Becomes:
+
+```
+https://site.com/api/users/123
+https://site.com/api/users/412/profile
+https://site.com/users/photos/photo.jpg
+```
+
 Why C++? Because it's super fast?!?! No not really, I'm working on my C++ skills and mostly just wanted to create a real-world C++ project as opposed to educational related work.
 
 ## Installation
@@ -67,6 +88,7 @@ $ ./urldedupe -h
 (-u|--urls) - Filename containing urls (use this if you don't pipe urls via stdin)
 (-V|--version) - Get current version for urldedupe
 (-r|--regex-parse) - This is significantly slower than normal parsing, but may be more thorough or accurate
+(-s|--similar) - Remove similar URLs (based on integers and image/font files) - i.e. /api/user/1 & /api/user/2 deduplicated
 ```
 
 ## Examples
@@ -78,6 +100,27 @@ Very simple, simply pass URLs from stdin or with the `-u` flag:
 After moving the `urldedupe` binary to your `bin` dir..Pass in list from stdin and save to a file:
 
 `cat urls.txt | urldedupe > deduped_urls.txt`
+
+Deduplicate similar URLs with `-s|--similar` flag, such as API endpoints with different IDs, or assets:
+
+`cat urls.txt | urldedupe -s`
+
+```
+https://site.com/api/users/123
+https://site.com/api/users/222
+https://site.com/api/users/412/profile
+https://site.com/users/photos/photo.jpg
+https://site.com/users/photos/myPhoto.jpg
+https://site.com/users/photos/photo.png
+```
+
+Becomes:
+
+```
+https://site.com/api/users/123
+https://site.com/api/users/412/profile
+https://site.com/users/photos/photo.jpg
+```
 
 For all the bug bounty hunters, I recommend chaining with tools such as `waybackurls` or `gau` to get back only unique URLs as those sources are prone to have many similar/duplicated URLs:
 
