@@ -27,4 +27,18 @@ inline char hex_digit(char c)
     return -1; // invalid hex digit; maybe throw instead?
 }
 
+// @brief Clone a string view referring to a string
+// @param str1 Some string
+// @param sv1 A string_view into str1
+// @param str2 A copy of str1 (or at least a string of the same length)
+// @return A string_view referring to the same substring of str2 as sv1 of str1
+inline std::string_view clone_string_view(const std::string &str1, const std::string_view &sv1, const std::string &str2)
+{
+    if (sv1.length() == 0)
+        return std::string_view(); // Empty string_view
+    auto start = sv1.data() - str1.data();
+
+    return std::string_view(str2).substr(start, sv1.length());
+}
+
 #endif // URLDEDUPE_UTILS_HPP
