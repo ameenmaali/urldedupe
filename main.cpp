@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
+#include "Url.hpp"
 #include "flags.hpp"
 #include "utils.hpp"
-#include "Url.hpp"
 
-const std::string VERSION {"1.0.4"};
+const std::string VERSION{"1.0.4"};
 
 int main(int argc, char **argv)
 {
@@ -18,11 +18,11 @@ int main(int argc, char **argv)
         options = parse_flags(argc, argv);
     }
 
-    std::vector<Url> urls {};
-    std::string filename {};
+    std::vector<Url> urls{};
+    std::string filename{};
 
-    bool regex_mode, similar_mode, query_strings_only, no_extensions_only {false};
-    for (const Option &option: options)
+    bool regex_mode, similar_mode, query_strings_only, no_extensions_only{false};
+    for (const Option &option : options)
     {
         if (option.flag.short_name == "-h")
         {
@@ -52,15 +52,17 @@ int main(int argc, char **argv)
             no_extensions_only = true;
     }
 
-    if (filename.length() > 0) {
+    if (filename.length() > 0)
+    {
         load_urls_from_file(urls, filename, regex_mode);
     }
-    else {
+    else
+    {
         read_urls_from_stream(urls, std::cin, regex_mode);
     }
 
     std::unordered_map<std::string, bool> deduped_url_keys;
-    for (auto &parsed_url: urls)
+    for (auto &parsed_url : urls)
     {
         // Move on to the next if -qs is enabled and URL has no query strings
         if (query_strings_only)
@@ -75,7 +77,7 @@ int main(int argc, char **argv)
                 continue;
         }
 
-        std::string url_key {parsed_url.get_url_key(similar_mode)};
+        std::string url_key{parsed_url.get_url_key(similar_mode)};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
             continue;
 

@@ -7,7 +7,8 @@
 
 #include <string>
 
-struct Flag {
+struct Flag
+{
     std::string short_name;
     std::string long_name;
     std::string usage;
@@ -15,7 +16,8 @@ struct Flag {
     bool is_switch;
 };
 
-struct Option {
+struct Option
+{
     Flag flag;
     std::string value;
 };
@@ -24,4 +26,4 @@ std::vector<Option> parse_flags(int argc, char **argv);
 void print_version(const std::string &version);
 void print_usage();
 
-#endif //URLDEDUPE_FLAGS_HPP
+#endif // URLDEDUPE_FLAGS_HPP
