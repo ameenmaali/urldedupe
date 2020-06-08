@@ -111,7 +111,7 @@ std::string Url::decode(const std::string &str)
 
 std::string Url::encode(const std::string &str)
 {
-    std::string encoded_str{};
+    std::string encoded_str {};
     char bufHex[10];
     const int len = str.length();
 
@@ -153,22 +153,22 @@ void Url::regex_parse()
     std::smatch match;
     if (std::regex_match(url_string, match, URL_REGEX))
     {
-        scheme        = match[2].str() + "://";
-        hostname      = match[4];
-        path          = match[5];
+        scheme = match[2].str() + "://";
+        hostname = match[4];
+        path = match[5];
         query_strings = match[7];
-        fragment      = match[9];
+        fragment = match[9];
     }
 }
 
 bool Url::parse()
 {
-    std::string_view url_view{url_string};
+    std::string_view url_view {url_string};
 
-    auto current{url_view.find("://")};
+    auto current {url_view.find("://")};
     if (current != std::string::npos)
     {
-        scheme   = url_view.substr(0, current + 3);
+        scheme = url_view.substr(0, current + 3);
         url_view = url_view.substr(current + 3);
     }
 
@@ -183,7 +183,7 @@ bool Url::parse()
     if (current != std::string::npos)
     {
         query_strings = url_view.substr(current + 1);
-        url_view      = url_view.substr(0, current);
+        url_view = url_view.substr(0, current);
     }
 
     current = url_view.find('/');
@@ -198,7 +198,7 @@ bool Url::parse()
 
 std::string Url::get_url_key(bool similar_mode)
 {
-    std::string url_key{};
+    std::string url_key {};
     if (similar_mode)
     {
         url_key += this->hostname + this->get_path_components();
@@ -208,25 +208,25 @@ std::string Url::get_url_key(bool similar_mode)
         url_key += this->hostname + this->path;
     }
 
-    std::string qs{get_query_strings()};
+    std::string qs {get_query_strings()};
     if (qs.empty())
         return url_key;
 
-    std::string token{};
+    std::string token {};
     size_t current;
-    std::vector<std::string> qs_vals{};
+    std::vector<std::string> qs_vals {};
     qs += "&";
     while ((current = qs.find('&')) != std::string::npos)
     {
         token = qs.substr(0, current);
         qs.erase(0, current + 1);
 
-        std::string qs_key{token.substr(0, token.find('='))};
+        std::string qs_key {token.substr(0, token.find('='))};
         qs_vals.push_back(qs_key);
     }
 
     url_key += "?";
-    for (const auto &x : qs_vals)
+    for (const auto &x: qs_vals)
         url_key += x + "&";
 
     return url_key;
@@ -234,12 +234,12 @@ std::string Url::get_url_key(bool similar_mode)
 
 std::string Url::get_path_components() const
 {
-    std::string path_components{};
+    std::string path_components {};
     if (this->path.empty())
         return path_components;
 
-    std::string url_path{this->path};
-    std::string token{};
+    std::string url_path {this->path};
+    std::string token {};
     size_t current;
 
     // Add trailing slash to get all path components (including last)
@@ -275,6 +275,6 @@ bool Url::is_asset(const std::string &str)
 
 bool Url::has_extension()
 {
-    std::filesystem::path fpath{this->path};
+    std::filesystem::path fpath {this->path};
     return fpath.has_extension();
 }
