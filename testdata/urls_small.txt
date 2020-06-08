@@ -19,6 +19,15 @@ https://site.com/photos/123.jpg
 https://site.com/photos/photo.jpeg
 https://site.com/photos/123.png
 https://site.com/photos/123.png?img=true
+https://site.com/photos/ddd
+https://site.com/photos/ddd?img=false
 http://go.com/home?qs=value#fragment=123
 https://go.com/a/b/c
 https://go.com/abc
+https://api.domain.com/product/1/buy/1
+https://api.domain.com/product/1/buy/2
+https://api.domain.com/product/2/buy/2
+https://domain.com/static/js/123.js
+https://domain.com/static/js/223.js?v=1223123
+https://domain.com/exes/223.exe
+https://domain.com/static/html/index.html

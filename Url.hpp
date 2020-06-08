@@ -13,7 +13,8 @@
 const std::regex URL_REGEX (R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)", std::regex::extended);
 const std::array ASSET_EXTENSIONS {
     ".jpg", ".jpeg", ".png", ".gif", ".tiff",
-    ".webm", ".svg", ".eot", ".ttf", ".woff"
+    ".webm", ".svg", ".eot", ".ttf", ".woff",
+    ".ico", ".woff2"
 };
 
 class Url {
@@ -47,7 +48,7 @@ public:
     static std::string decode(const std::string&);
     static std::string encode(const std::string&);
 
-    static bool is_image(const std::string &str);
+    static bool is_asset(const std::string &str);
 
     const std::string &get_url_string() const;
 
@@ -57,6 +58,8 @@ public:
     std::string get_url_key(bool similar_mode);
 
     std::string get_path_components() const;
+
+    bool has_extension();
 };
 
 #endif //URLDEDUPE_URL_HPP
