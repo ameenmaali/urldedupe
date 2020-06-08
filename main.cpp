@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     std::vector<Url> urls {};
     std::string filename {};
 
-    bool regex_mode, similar_mode, query_strings_only, extensions_only {false};
+    bool regex_mode, similar_mode, query_strings_only, no_extensions_only {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
             query_strings_only = true;
 
         if (option.flag.short_name == "-ne")
-            extensions_only = true;
+            no_extensions_only = true;
     }
 
     if (filename.length() > 0) {
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
                 continue;
         }
 
-        if (extensions_only)
+        if (no_extensions_only)
         {
             if (parsed_url.has_extension())
                 continue;
