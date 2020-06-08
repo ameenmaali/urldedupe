@@ -4,16 +4,18 @@
 
 #include <filesystem>
 #include <regex>
+
 #include "Url.hpp"
 #include "utils.hpp"
 
-Url::Url(const std::string &url, bool regex_mode)
-    : url_string(url)
+Url::Url(const std::string &url, bool regex_mode) : url_string(url)
 {
     if (regex_mode)
     {
         this->regex_parse();
-    } else {
+    }
+    else
+    {
         this->parse();
     }
 }
@@ -78,39 +80,42 @@ bool Url::is_encoded(const std::string &u)
     return u.find('%') != std::string::npos;
 }
 
-std::string Url::decode(const std::string& str)
+std::string Url::decode(const std::string &str)
 {
     std::string ret;
     auto len = str.length();
 
-    for (std::size_t i=0; i < len; i++)
+    for (std::size_t i = 0; i < len; i++)
     {
         if (str[i] != '%')
         {
-            if(str[i] == '+')
+            if (str[i] == '+')
             {
                 ret += ' ';
             }
-            else {
+            else
+            {
                 ret += str[i];
             }
-        } else {
+        }
+        else
+        {
             // If str[i+2] does not exist, this will crash.
             // This also means the URL is invalid, so...
-            ret += hex_digit(str[i+1])*16 + hex_digit(str[i+2]);
+            ret += hex_digit(str[i + 1]) * 16 + hex_digit(str[i + 2]);
             i = i + 2;
         }
     }
     return ret;
 }
 
-std::string Url::encode(const std::string& str)
+std::string Url::encode(const std::string &str)
 {
     std::string encoded_str {};
     char bufHex[10];
     const int len = str.length();
 
-    for (int i=0; i<len; i++)
+    for (int i = 0; i < len; i++)
     {
         auto c = str[i];
 
@@ -118,15 +123,17 @@ std::string Url::encode(const std::string& str)
         {
             encoded_str += '+';
         }
-        else {
+        else
+        {
             if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
             {
                 encoded_str += c;
             }
-            else {
+            else
+            {
                 sprintf(bufHex, "%X", c);
 
-                if(static_cast<int>(c) < 16)
+                if (static_cast<int>(c) < 16)
                 {
                     encoded_str += "%0";
                 }
@@ -140,7 +147,6 @@ std::string Url::encode(const std::string& str)
     }
     return encoded_str;
 }
-
 
 void Url::regex_parse()
 {
@@ -162,33 +168,30 @@ bool Url::parse()
     auto current {url_view.find("://")};
     if (current != std::string::npos)
     {
-        scheme = url_view.substr(0, current+3);
-        url_view = url_view.substr(current+3);
+        scheme = url_view.substr(0, current + 3);
+        url_view = url_view.substr(current + 3);
     }
-
 
     current = url_view.find('#');
     if (current != std::string::npos)
     {
-        fragment = url_view.substr(current+1);
-        url_view = url_view.substr(0,current);
+        fragment = url_view.substr(current + 1);
+        url_view = url_view.substr(0, current);
     }
-
 
     current = url_view.find('?');
     if (current != std::string::npos)
     {
-        query_strings = url_view.substr(current+1);
-        url_view = url_view.substr(0,current);
+        query_strings = url_view.substr(current + 1);
+        url_view = url_view.substr(0, current);
     }
-
 
     current = url_view.find('/');
     if (current != std::string::npos)
     {
         path = url_view.substr(current);
     }
-    hostname = url_view.substr(0,current);
+    hostname = url_view.substr(0, current);
 
     return true;
 }
@@ -199,7 +202,9 @@ std::string Url::get_url_key(bool similar_mode)
     if (similar_mode)
     {
         url_key += this->hostname + this->get_path_components();
-    } else {
+    }
+    else
+    {
         url_key += this->hostname + this->path;
     }
 
@@ -262,7 +267,7 @@ bool Url::is_asset(const std::string &str)
     size_t current;
     current = str.find('.');
     if (current == std::string::npos)
-         return false;
+        return false;
 
     std::string extension = str.substr(current, std::string::npos);
     return find(ASSET_EXTENSIONS.begin(), ASSET_EXTENSIONS.end(), extension) != ASSET_EXTENSIONS.end();

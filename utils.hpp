@@ -16,11 +16,15 @@ void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_
 
 bool is_number(const std::string &str);
 
-inline char hex_digit(char c) {
-    if('0' <= c and c <= '9') return (c - '0');
-    if('a' <= c and c <= 'f') return (c - 'a' + 10);
-    if('A' <= c and c <= 'F') return (c - 'A' + 10);
-    return -1;  // invalid hex digit; maybe throw instead?
+inline char hex_digit(char c)
+{
+    if ('0' <= c and c <= '9')
+        return (c - '0');
+    if ('a' <= c and c <= 'f')
+        return (c - 'a' + 10);
+    if ('A' <= c and c <= 'F')
+        return (c - 'A' + 10);
+    return -1; // invalid hex digit; maybe throw instead?
 }
 
-#endif //URLDEDUPE_UTILS_HPP
+#endif // URLDEDUPE_UTILS_HPP

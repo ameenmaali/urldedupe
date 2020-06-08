@@ -5,27 +5,26 @@
 #ifndef URLDEDUPE_URL_HPP
 #define URLDEDUPE_URL_HPP
 
-#include <string>
-#include <regex>
 #include <array>
+#include <regex>
+#include <string>
 
-//RFC 3986 Recommendation for URL Regex: https://tools.ietf.org/html/rfc3986#page-51
-const std::regex URL_REGEX (R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)", std::regex::extended);
-const std::array ASSET_EXTENSIONS {
-    ".jpg", ".jpeg", ".png", ".gif", ".tiff",
-    ".webm", ".svg", ".eot", ".ttf", ".woff",
-    ".ico", ".woff2"
-};
+// RFC 3986 Recommendation for URL Regex: https://tools.ietf.org/html/rfc3986#page-51
+const std::regex URL_REGEX(R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)", std::regex::extended);
+const std::array ASSET_EXTENSIONS {".jpg", ".jpeg", ".png", ".gif",  ".tiff", ".webm",
+                                   ".svg", ".eot",  ".ttf", ".woff", ".ico",  ".woff2"};
 
-class Url {
-private:
+class Url
+{
+  private:
     const std::string url_string;
     std::string scheme;
     std::string hostname;
     std::string path;
     std::string query_strings;
     std::string fragment;
-public:
+
+  public:
     Url(const std::string &url, bool regex_mode = false);
     ~Url() = default;
 
@@ -45,8 +44,8 @@ public:
     void set_fragment(const std::string &fragment);
 
     static bool is_encoded(const std::string &u);
-    static std::string decode(const std::string&);
-    static std::string encode(const std::string&);
+    static std::string decode(const std::string &);
+    static std::string encode(const std::string &);
 
     static bool is_asset(const std::string &str);
 
@@ -62,4 +61,4 @@ public:
     bool has_extension();
 };
 
-#endif //URLDEDUPE_URL_HPP
+#endif // URLDEDUPE_URL_HPP

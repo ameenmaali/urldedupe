@@ -57,11 +57,11 @@ const auto flags = std::array {
 
 std::vector<Option> parse_flags(int argc, char **argv)
 {
-    std::vector<Option> options{};
+    std::vector<Option> options {};
 
-    for (int i{0}; i < argc; i++)
+    for (int i {0}; i < argc; i++)
     {
-        for (const auto &flag : flags)
+        for (const auto &flag: flags)
         {
             if (argv[i] == flag.short_name || argv[i] == flag.long_name)
             {
@@ -94,7 +94,7 @@ void print_version(const std::string &version)
 
 void print_usage()
 {
-    for (const auto &flag : flags)
+    for (const auto &flag: flags)
     {
         std::cout << "(" << flag.short_name << "|" << flag.long_name << ") - " << flag.usage << std::endl;
     }

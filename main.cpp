@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
+#include "Url.hpp"
 #include "flags.hpp"
 #include "utils.hpp"
-#include "Url.hpp"
 
 const std::string VERSION {"1.0.4"};
 
@@ -52,10 +52,12 @@ int main(int argc, char **argv)
             no_extensions_only = true;
     }
 
-    if (filename.length() > 0) {
+    if (filename.length() > 0)
+    {
         load_urls_from_file(urls, filename, regex_mode);
     }
-    else {
+    else
+    {
         read_urls_from_stream(urls, std::cin, regex_mode);
     }
 
