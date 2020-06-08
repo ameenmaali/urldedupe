@@ -2,6 +2,7 @@
 // Created by Ameen Maali on 6/1/20.
 //
 
+#include <filesystem>
 #include <regex>
 #include "Url.hpp"
 #include "utils.hpp"
@@ -246,9 +247,9 @@ std::string Url::get_path_components() const
         // Append to path_components depending on what time of component is found
         // Also, add back trailing slash to separate components
         if (is_number(token))
-            path_components += "int/";
-        else if (is_image(token))
-            path_components += "image/";
+            path_components += "dedupeInt/";
+        else if (is_asset(token))
+            path_components += "dedupeAsset/";
         else
             path_components += token + "/";
     }
@@ -256,7 +257,7 @@ std::string Url::get_path_components() const
     return path_components;
 }
 
-bool Url::is_image(const std::string &str)
+bool Url::is_asset(const std::string &str)
 {
     size_t current;
     current = str.find('.');
@@ -265,4 +266,10 @@ bool Url::is_image(const std::string &str)
 
     std::string extension = str.substr(current, std::string::npos);
     return find(ASSET_EXTENSIONS.begin(), ASSET_EXTENSIONS.end(), extension) != ASSET_EXTENSIONS.end();
+}
+
+bool Url::has_extension()
+{
+    std::filesystem::path fpath {this->path};
+    return fpath.has_extension();
 }

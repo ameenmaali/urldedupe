@@ -7,7 +7,7 @@
 #include "utils.hpp"
 #include "Url.hpp"
 
-const std::string VERSION {"1.0.3"};
+const std::string VERSION {"1.0.4"};
 
 int main(int argc, char **argv)
 {
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     std::vector<Url> urls {};
     std::string filename {};
 
-    bool regex_mode, similar_mode {false};
+    bool regex_mode, similar_mode, query_strings_only, extensions_only {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -44,6 +44,12 @@ int main(int argc, char **argv)
 
         if (option.flag.short_name == "-s")
             similar_mode = true;
+
+        if (option.flag.short_name == "-qs")
+            query_strings_only = true;
+
+        if (option.flag.short_name == "-ne")
+            extensions_only = true;
     }
 
     if (filename.length() > 0) {
@@ -56,6 +62,19 @@ int main(int argc, char **argv)
     std::unordered_map<std::string, bool> deduped_url_keys;
     for (auto &parsed_url: urls)
     {
+        // Move on to the next if -qs is enabled and URL has no query strings
+        if (query_strings_only)
+        {
+            if (parsed_url.get_query_strings().empty())
+                continue;
+        }
+
+        if (extensions_only)
+        {
+            if (parsed_url.has_extension())
+                continue;
+        }
+
         std::string url_key {parsed_url.get_url_key(similar_mode)};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
             continue;

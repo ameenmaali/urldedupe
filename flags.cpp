@@ -39,6 +39,18 @@ const auto flags = std::array {
         .long_name="--similar",
         .usage="Remove similar URLs (based on integers and image/font files) - i.e. /api/user/1 & /api/user/2 deduplicated",
         .required=false,
+        .is_switch=true },
+        Flag{
+        .short_name="-qs",
+        .long_name="--query-strings-only",
+        .usage="Only include URLs if they have query strings",
+        .required=false,
+        .is_switch=true },
+        Flag{
+        .short_name="-ne",
+        .long_name="--no-extensions",
+        .usage="Do not include URLs if they have an extension (i.e. .png, .jpg, .woff, .js, .html)",
+        .required=false,
         .is_switch=true }
 };
 // clang-format on
