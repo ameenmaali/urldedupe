@@ -89,6 +89,9 @@ $ ./urldedupe -h
 (-V|--version) - Get current version for urldedupe
 (-r|--regex-parse) - This is significantly slower than normal parsing, but may be more thorough or accurate
 (-s|--similar) - Remove similar URLs (based on integers and image/font files) - i.e. /api/user/1 & /api/user/2 deduplicated
+(-qs|--query-strings-only) - Only include URLs if they have query strings
+(-ne|--no-extensions) - Do not include URLs if they have an extension (i.e. .png, .jpg, .woff, .js, .html)
+(-m|--mode) - The mode/filters to be enabled (can be 1 or more, comma separated). Default is none, available options are the other flags (--mode "r,s,qs,ne")
 ```
 
 ## Examples
@@ -129,3 +132,14 @@ For all the bug bounty hunters, I recommend chaining with tools such as `wayback
 For max thoroughness (usually not necessary), you can use an RFC complaint regex for URL parsing, but it is significantly slower for large data sets:
 
 `cat urls.txt | urldedupe -r > deduped_urls_regex.txt`
+
+Alternatively, use `-m|--mode` with the flag values you'd like to run with. For example, if you want
+to get URLs deduped based on similarity, include only URLs that have query strings, and do not have extensions...
+
+Instead of:
+
+`urldedupe -u urls.txt -s -qs -ne`
+
+You can also do:
+
+`urldedupe -u urls.txt -m "s,qs,ne"`

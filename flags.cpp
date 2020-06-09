@@ -51,7 +51,13 @@ const auto flags = std::array {
         .long_name="--no-extensions",
         .usage="Do not include URLs if they have an extension (i.e. .png, .jpg, .woff, .js, .html)",
         .required=false,
-        .is_switch=true }
+        .is_switch=true },
+        Flag{
+        .short_name="-m",
+        .long_name="--mode",
+        .usage="The mode/filters to be enabled (can be 1 or more, comma separated). Default is none, available options are the other flags (--mode \"r,s,qs,ne\")",
+        .required=false,
+        .is_switch=false },
 };
 // clang-format on
 
@@ -85,6 +91,53 @@ std::vector<Option> parse_flags(int argc, char **argv)
         }
     }
     return options;
+}
+
+void parse_cli_options(const Option &option, CliOptions &cli_options)
+{
+    if (option.flag.short_name == "-u")
+        cli_options.filename = option.value;
+
+    if (option.flag.short_name == "-r")
+        cli_options.regex_mode = true;
+
+    if (option.flag.short_name == "-s")
+        cli_options.similar_mode = true;
+
+    if (option.flag.short_name == "-qs")
+        cli_options.query_strings_only = true;
+
+    if (option.flag.short_name == "-ne")
+        cli_options.no_extensions_only = true;
+
+    if (option.flag.short_name == "-m")
+    {
+        std::string mode {option.value};
+        if (mode.empty())
+            return;
+
+        size_t current;
+        std::string token {};
+
+        mode += ',';
+        while ((current = mode.find(',')) != std::string::npos)
+        {
+            token = mode.substr(0, current);
+            mode.erase(0, current + 1);
+
+            if (token == "r" || token == "regex-mode")
+                cli_options.regex_mode = true;
+
+            if (token == "s" || token == "similar")
+                cli_options.similar_mode = true;
+
+            if (token == "qs" || token == "query-strings-only")
+                cli_options.query_strings_only = true;
+
+            if (token == "ne" || token == "no-extensions")
+                cli_options.no_extensions_only = true;
+        }
+    }
 }
 
 void print_version(const std::string &version)

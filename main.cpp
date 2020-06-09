@@ -11,6 +11,7 @@ const std::string VERSION {"1.0.4"};
 
 int main(int argc, char **argv)
 {
+    CliOptions cli_options {};
     // Parse flags if provided
     std::vector<Option> options;
     if (argc > 1)
@@ -21,7 +22,6 @@ int main(int argc, char **argv)
     std::vector<Url> urls {};
     std::string filename {};
 
-    bool regex_mode, similar_mode, query_strings_only, no_extensions_only {false};
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -36,48 +36,32 @@ int main(int argc, char **argv)
             return 0;
         }
 
-        if (option.flag.short_name == "-u")
-            filename = option.value;
+        parse_cli_options(option, cli_options);
 
-        if (option.flag.short_name == "-r")
-            regex_mode = true;
-
-        if (option.flag.short_name == "-s")
-            similar_mode = true;
-
-        if (option.flag.short_name == "-qs")
-            query_strings_only = true;
-
-        if (option.flag.short_name == "-ne")
-            no_extensions_only = true;
     }
 
-    if (filename.length() > 0)
-    {
-        load_urls_from_file(urls, filename, regex_mode);
-    }
+    if (cli_options.filename.length() > 0)
+        load_urls_from_file(urls, cli_options.filename, cli_options.regex_mode);
     else
-    {
-        read_urls_from_stream(urls, std::cin, regex_mode);
-    }
+        read_urls_from_stream(urls, std::cin, cli_options.regex_mode);
 
     std::unordered_map<std::string, bool> deduped_url_keys;
     for (auto &parsed_url: urls)
     {
         // Move on to the next if -qs is enabled and URL has no query strings
-        if (query_strings_only)
+        if (cli_options.query_strings_only)
         {
             if (parsed_url.get_query_strings().empty())
                 continue;
         }
 
-        if (no_extensions_only)
+        if (cli_options.no_extensions_only)
         {
             if (parsed_url.has_extension())
                 continue;
         }
 
-        std::string url_key {parsed_url.get_url_key(similar_mode)};
+        std::string url_key {parsed_url.get_url_key(cli_options.similar_mode)};
         if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
             continue;
 
