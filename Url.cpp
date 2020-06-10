@@ -20,54 +20,38 @@ Url::Url(const std::string &url, bool regex_mode) : url_string(url)
     }
 }
 
-const std::string &Url::get_scheme() const
+Url::Url(const Url &other) : url_string(other.url_string)
+{
+    scheme = clone_string_view(other.url_string, other.scheme, url_string);
+    hostname = clone_string_view(other.url_string, other.hostname, url_string);
+    path = clone_string_view(other.url_string, other.path, url_string);
+    query_strings = clone_string_view(other.url_string, other.query_strings, url_string);
+    fragment = clone_string_view(other.url_string, other.fragment, url_string);
+}
+
+std::string_view Url::get_scheme() const
 {
     return scheme;
 }
 
-void Url::set_scheme(const std::string &scheme)
-{
-    Url::scheme = scheme;
-}
-
-const std::string &Url::get_hostname() const
+std::string_view Url::get_hostname() const
 {
     return hostname;
 }
 
-void Url::set_hostname(const std::string &hostname)
-{
-    Url::hostname = hostname;
-}
-
-const std::string &Url::get_path() const
+std::string_view Url::get_path() const
 {
     return path;
 }
 
-void Url::set_path(const std::string &path)
-{
-    Url::path = path;
-}
-
-const std::string &Url::get_query_strings() const
+std::string_view Url::get_query_strings() const
 {
     return query_strings;
 }
 
-void Url::set_query_strings(const std::string &query_strings)
-{
-    Url::query_strings = query_strings;
-}
-
-const std::string &Url::get_fragment() const
+std::string_view Url::get_fragment() const
 {
     return fragment;
-}
-
-void Url::set_fragment(const std::string &fragment)
-{
-    Url::fragment = fragment;
 }
 
 const std::string &Url::get_url_string() const
@@ -150,14 +134,20 @@ std::string Url::encode(const std::string &str)
 
 void Url::regex_parse()
 {
+    auto make_sv = [&](const std::ssub_match &m) -> std::string_view {
+        if (not m.matched)
+            return {};
+        auto start = m.first - std::begin(url_string);
+        return std::string_view(url_string.data() + start, m.length());
+    };
     std::smatch match;
     if (std::regex_match(url_string, match, URL_REGEX))
     {
-        scheme = match[2].str() + "://";
-        hostname = match[4];
-        path = match[5];
-        query_strings = match[7];
-        fragment = match[9];
+        scheme = make_sv(match[2]);
+        hostname = make_sv(match[4]);
+        path = make_sv(match[5]);
+        query_strings = make_sv(match[7]);
+        fragment = make_sv(match[9]);
     }
 }
 
@@ -199,13 +189,14 @@ bool Url::parse()
 std::string Url::get_url_key(bool similar_mode)
 {
     std::string url_key {};
+    url_key += this->hostname;
     if (similar_mode)
     {
-        url_key += this->hostname + this->get_path_components();
+        url_key += this->get_path_components();
     }
     else
     {
-        url_key += this->hostname + this->path;
+        url_key += this->path;
     }
 
     std::string qs {get_query_strings()};

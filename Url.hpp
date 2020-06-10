@@ -18,32 +18,25 @@ class Url
 {
   private:
     const std::string url_string;
-    std::string scheme;
-    std::string hostname;
-    std::string path;
-    std::string query_strings;
-    std::string fragment;
+    std::string_view scheme;
+    std::string_view hostname;
+    std::string_view path;
+    std::string_view query_strings;
+    std::string_view fragment;
 
   public:
     Url(const std::string &url, bool regex_mode = false);
+    Url(const Url &);
+    Url(Url &&) = default;
     ~Url() = default;
 
-    const std::string &get_scheme() const;
-    void set_scheme(const std::string &scheme);
+    std::string_view get_scheme() const;
+    std::string_view get_hostname() const;
+    std::string_view get_path() const;
+    std::string_view get_query_strings() const;
+    std::string_view get_fragment() const;
 
-    const std::string &get_hostname() const;
-    void set_hostname(const std::string &hostname);
-
-    const std::string &get_path() const;
-    void set_path(const std::string &path);
-
-    const std::string &get_query_strings() const;
-    void set_query_strings(const std::string &query_strings);
-
-    const std::string &get_fragment() const;
-    void set_fragment(const std::string &fragment);
-
-    static bool is_encoded(const std::string &u);
+    static bool is_encoded(const std::string &);
     static std::string decode(const std::string &);
     static std::string encode(const std::string &);
 
