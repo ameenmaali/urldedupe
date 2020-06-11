@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include "extern/SpookyV2.h"
+
 class Url;
 
 bool load_urls_from_file(std::vector<Url> &urls, const std::string &filename, bool regex_mode);
@@ -40,5 +42,18 @@ inline std::string_view clone_string_view(const std::string &str1, const std::st
 
     return std::string_view(str2).substr(start, sv1.length());
 }
+
+inline auto makeSpookyHash(std::string_view sv) {
+    std::pair<uint64_t, uint64_t> ret{};
+    SpookyHash::Hash128(sv.data(), sv.length(), &ret.first, &ret.second);
+    return ret;
+}
+
+template<>
+struct std::hash<std::pair<uint64_t, uint64_t>> {
+    std::size_t operator()(const std::pair<uint64_t, uint64_t>& val) const {
+        return (val.first) ^ (val.second);
+    }
+};
 
 #endif // URLDEDUPE_UTILS_HPP

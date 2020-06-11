@@ -58,7 +58,7 @@ int main(int argc, char **argv)
         }
     }();
 
-    std::unordered_set<std::string> deduped_url_keys;
+    std::unordered_set<std::pair<uint64_t, uint64_t>> deduped_url_keys;
     for (auto it = std::istream_iterator<std::string>(input_stream); it != std::istream_iterator<std::string>(); it++)
     {
         auto parsed_url = Url(*it, cli_options.regex_mode);
@@ -76,7 +76,8 @@ int main(int argc, char **argv)
         }
 
         std::string url_key {parsed_url.get_url_key(cli_options.similar_mode)};
-        auto [_, inserted] = deduped_url_keys.insert(url_key);
+        auto url_hash = makeSpookyHash(url_key);
+        auto [_, inserted] = deduped_url_keys.insert(url_hash);
 
         if (inserted)
         {
