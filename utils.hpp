@@ -16,7 +16,7 @@ bool load_urls_from_file(std::vector<Url> &urls, const std::string &filename, bo
 
 void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_mode);
 
-bool is_number(const std::string &str);
+bool is_number(std::string_view str);
 
 inline char hex_digit(char c)
 {
@@ -43,16 +43,18 @@ inline std::string_view clone_string_view(const std::string &str1, const std::st
     return std::string_view(str2).substr(start, sv1.length());
 }
 
-inline auto makeSpookyHash(std::string_view sv) {
-    std::pair<uint64_t, uint64_t> ret{};
+inline auto makeSpookyHash(std::string_view sv)
+{
+    std::pair<uint64_t, uint64_t> ret {};
     SpookyHash::Hash128(sv.data(), sv.length(), &ret.first, &ret.second);
     return ret;
 }
 
-template<>
-struct std::hash<std::pair<uint64_t, uint64_t>> {
-    std::size_t operator()(const std::pair<uint64_t, uint64_t>& val) const {
-        return (val.first) ^ (val.second);
+template <> struct std::hash<std::pair<uint64_t, uint64_t>>
+{
+    std::size_t operator()(const std::pair<uint64_t, uint64_t> &val) const
+    {
+        return (val.first);
     }
 };
 

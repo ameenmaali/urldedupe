@@ -40,7 +40,7 @@ class Url
     static std::string decode(const std::string &);
     static std::string encode(const std::string &);
 
-    static bool is_asset(const std::string &str);
+    static bool is_asset(std::string_view str);
 
     const std::string &get_url_string() const;
 
@@ -48,6 +48,8 @@ class Url
     bool parse();
 
     std::string get_url_key(bool similar_mode);
+
+    std::pair<uint64_t, uint64_t> get_url_hash(bool similar_mode) const;
 
     std::string get_path_components() const;
 

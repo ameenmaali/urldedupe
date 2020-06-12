@@ -75,8 +75,7 @@ int main(int argc, char **argv)
                 continue;
         }
 
-        std::string url_key {parsed_url.get_url_key(cli_options.similar_mode)};
-        auto url_hash = makeSpookyHash(url_key);
+        auto url_hash = parsed_url.get_url_hash(cli_options.similar_mode);
         auto [_, inserted] = deduped_url_keys.insert(url_hash);
 
         if (inserted)
