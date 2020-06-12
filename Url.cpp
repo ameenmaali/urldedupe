@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <regex>
 
+#include "Hasher.hpp"
 #include "Url.hpp"
 #include "utils.hpp"
 
@@ -186,13 +187,12 @@ bool Url::parse()
     return true;
 }
 
-std::pair<uint64_t, uint64_t> Url::get_url_hash(bool similar_mode) const
+Hasher::Hash128_t Url::get_url_hash(bool similar_mode) const
 {
-    SpookyHash hasher;
-    hasher.Init(0, 0);
+    Hasher hasher({0, 0});
 
     auto hostname_no_port = hostname.substr(0, hostname.find(':'));
-    hasher.Update(hostname_no_port.data(), hostname_no_port.length());
+    hasher << hostname_no_port;
     // hasher.Update(hostname.data(), hostname.length());
 
     if (similar_mode and not(path.empty()))
@@ -202,15 +202,15 @@ std::pair<uint64_t, uint64_t> Url::get_url_hash(bool similar_mode) const
         auto hash_path_component = [&hasher](std::string_view sv) {
             if (is_asset(sv))
             {
-                hasher.Update("/a.jpg", 6);
+                hasher << "/a.jpg";
             }
             else if (is_number(sv))
             {
-                hasher.Update("/1", 2);
+                hasher << "1/";
             }
             else
             {
-                hasher.Update(sv.data(), sv.length());
+                hasher << sv;
             }
         };
 
@@ -228,18 +228,18 @@ std::pair<uint64_t, uint64_t> Url::get_url_hash(bool similar_mode) const
     }
     else
     {
-        hasher.Update(path.data(), path.length());
+        hasher << path;
     }
 
-    hasher.Update("?", 1);
+    hasher << "?";
 
     auto hash_query_string = [&hasher](std::string_view sv) {
         auto pos = sv.find('=');
         sv = sv.substr(0, pos);
-        hasher.Update("&", 1); // Delimit path from Query strings
-                               // This avoids /a?b=c&d=e being the
-                               // same as     /a/b&d=e
-        hasher.Update(sv.data(), sv.length());
+        hasher << "&"; // Delimit path from Query strings
+                       // This avoids /a?b=c&d=e being the
+                       // same as     /a/b&d=e
+        hasher << sv;
     };
 
     std::size_t last_pos = 0;
@@ -252,9 +252,7 @@ std::pair<uint64_t, uint64_t> Url::get_url_hash(bool similar_mode) const
     }
     hash_query_string(query_strings.substr(last_pos, std::string_view::npos));
 
-    std::pair<uint64_t, uint64_t> ret;
-    hasher.Final(&ret.first, &ret.second);
-    return ret;
+    return hasher.Final();
 }
 
 std::string Url::get_url_key(bool similar_mode)

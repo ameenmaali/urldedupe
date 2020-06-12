@@ -9,6 +9,8 @@
 #include <regex>
 #include <string>
 
+#include "Hasher.hpp"
+
 // RFC 3986 Recommendation for URL Regex: https://tools.ietf.org/html/rfc3986#page-51
 const std::regex URL_REGEX(R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)", std::regex::extended);
 const std::array ASSET_EXTENSIONS {".jpg", ".jpeg", ".png", ".gif",  ".tiff", ".webm",
@@ -49,7 +51,7 @@ class Url
 
     std::string get_url_key(bool similar_mode);
 
-    std::pair<uint64_t, uint64_t> get_url_hash(bool similar_mode) const;
+    Hasher::Hash128_t get_url_hash(bool similar_mode) const;
 
     std::string get_path_components() const;
 
