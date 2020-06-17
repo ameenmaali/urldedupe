@@ -58,10 +58,11 @@ int main(int argc, char **argv)
         }
     }();
 
-    std::unordered_set<Hasher::Hash128_t> deduped_url_keys;
-    for (auto it = std::istream_iterator<std::string>(input_stream); it != std::istream_iterator<std::string>(); it++)
+    std::unordered_set<Hasher::Hash128_t, TrivialHash> deduped_url_keys;
+    std::string line;
+    while (getline(input_stream, line))
     {
-        auto parsed_url = Url(*it, cli_options.regex_mode);
+        auto parsed_url = Url(line, cli_options.regex_mode);
         // Move on to the next if -qs is enabled and URL has no query strings
         if (cli_options.query_strings_only)
         {

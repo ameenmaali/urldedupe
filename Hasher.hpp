@@ -59,7 +59,7 @@ inline Hasher &operator<<(Hasher &h, std::string_view sv)
     return h;
 }
 
-template <> struct std::hash<Hasher::Hash128_t>
+struct TrivialHash
 {
     std::size_t operator()(const Hasher::Hash128_t &val) const
     {

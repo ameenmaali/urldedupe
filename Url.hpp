@@ -19,7 +19,7 @@ const std::array ASSET_EXTENSIONS {".jpg", ".jpeg", ".png", ".gif",  ".tiff", ".
 class Url
 {
   private:
-    const std::string url_string;
+    std::string url_string;
     std::string_view scheme;
     std::string_view hostname;
     std::string_view path;
