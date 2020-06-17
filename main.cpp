@@ -1,6 +1,7 @@
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "Url.hpp"
@@ -19,9 +20,6 @@ int main(int argc, char **argv)
         options = parse_flags(argc, argv);
     }
 
-    std::vector<Url> urls {};
-    std::string filename {};
-
     for (const Option &option: options)
     {
         if (option.flag.short_name == "-h")
@@ -37,17 +35,34 @@ int main(int argc, char **argv)
         }
 
         parse_cli_options(option, cli_options);
-
     }
 
-    if (cli_options.filename.length() > 0)
-        load_urls_from_file(urls, cli_options.filename, cli_options.regex_mode);
-    else
-        read_urls_from_stream(urls, std::cin, cli_options.regex_mode);
+    std::unique_ptr<std::ifstream> file_ptr; // Lifetime management
+    auto &input_stream = [&]() -> std::istream & {
+        if (cli_options.filename.length() > 0)
+        {
+            file_ptr = std::make_unique<std::ifstream>(cli_options.filename);
+            if (!(*file_ptr))
+            {
+                std::cout << "Unable to open file " << cli_options.filename << std::endl;
+                std::exit(-1);
+            }
+            else
+            {
+                return *file_ptr;
+            }
+        }
+        else
+        {
+            return std::cin;
+        }
+    }();
 
-    std::unordered_map<std::string, bool> deduped_url_keys;
-    for (auto &parsed_url: urls)
+    std::unordered_set<Hasher::Hash128_t, TrivialHash> deduped_url_keys;
+    std::string line;
+    while (getline(input_stream, line))
     {
+        auto parsed_url = Url(line, cli_options.regex_mode);
         // Move on to the next if -qs is enabled and URL has no query strings
         if (cli_options.query_strings_only)
         {
@@ -61,14 +76,13 @@ int main(int argc, char **argv)
                 continue;
         }
 
-        std::string url_key {parsed_url.get_url_key(cli_options.similar_mode)};
-        if (deduped_url_keys.find(url_key) != deduped_url_keys.end())
-            continue;
+        auto url_hash = parsed_url.get_url_hash(cli_options.similar_mode);
+        auto [_, inserted] = deduped_url_keys.insert(url_hash);
 
-        deduped_url_keys.insert(std::make_pair(url_key, true));
-
-        // If it has made it to this point, it's a non-duplicate URL. Print it
-        std::cout << parsed_url.get_url_string() << std::endl;
+        if (inserted)
+        {
+            std::cout << parsed_url.get_url_string() << "\n";
+        }
     }
 
     return 0;

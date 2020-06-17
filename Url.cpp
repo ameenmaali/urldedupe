@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <regex>
 
+#include "Hasher.hpp"
 #include "Url.hpp"
 #include "utils.hpp"
 
@@ -186,6 +187,74 @@ bool Url::parse()
     return true;
 }
 
+Hasher::Hash128_t Url::get_url_hash(bool similar_mode) const
+{
+    Hasher hasher({0, 0});
+
+    auto hostname_no_port = hostname.substr(0, hostname.find(':'));
+    hasher << hostname_no_port;
+    // hasher.Update(hostname.data(), hostname.length());
+
+    if (similar_mode and not(path.empty()))
+    {
+        // Hash components of the path separately;
+        // Ignore numbers etc.
+        auto hash_path_component = [&hasher](std::string_view sv) {
+            if (is_asset(sv))
+            {
+                hasher << "/a.jpg";
+            }
+            else if (is_number(sv))
+            {
+                hasher << "1/";
+            }
+            else
+            {
+                hasher << sv;
+            }
+        };
+
+        std::size_t last_pos = 0;
+        std::size_t pos = 0;
+        // Ignore the leading / of every component for searching,
+        // but include it in the hash.
+        // this avoids collisions between /a/b and /ab
+        while ((pos = path.find('/', pos + 1)) != std::string_view::npos)
+        {
+            hash_path_component(path.substr(last_pos, pos - last_pos));
+            last_pos = pos;
+        }
+        hash_path_component(path.substr(last_pos, std::string_view::npos));
+    }
+    else
+    {
+        hasher << path;
+    }
+
+    hasher << "?";
+
+    auto hash_query_string = [&hasher](std::string_view sv) {
+        auto pos = sv.find('=');
+        sv = sv.substr(0, pos);
+        hasher << "&"; // Delimit path from Query strings
+                       // This avoids /a?b=c&d=e being the
+                       // same as     /a/b&d=e
+        hasher << sv;
+    };
+
+    std::size_t last_pos = 0;
+    std::size_t pos = 0;
+    while ((pos = query_strings.find('&', pos)) != std::string_view::npos)
+    {
+        hash_query_string(query_strings.substr(last_pos, pos - last_pos));
+        pos++; // Ignore the &
+        last_pos = pos;
+    }
+    hash_query_string(query_strings.substr(last_pos, std::string_view::npos));
+
+    return hasher.Final();
+}
+
 std::string Url::get_url_key(bool similar_mode)
 {
     std::string url_key {};
@@ -253,14 +322,14 @@ std::string Url::get_path_components() const
     return path_components;
 }
 
-bool Url::is_asset(const std::string &str)
+bool Url::is_asset(std::string_view str)
 {
     size_t current;
     current = str.find('.');
     if (current == std::string::npos)
         return false;
 
-    std::string extension = str.substr(current, std::string::npos);
+    auto extension = str.substr(current, std::string_view::npos);
     return find(ASSET_EXTENSIONS.begin(), ASSET_EXTENSIONS.end(), extension) != ASSET_EXTENSIONS.end();
 }
 

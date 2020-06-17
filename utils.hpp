@@ -14,7 +14,7 @@ bool load_urls_from_file(std::vector<Url> &urls, const std::string &filename, bo
 
 void read_urls_from_stream(std::vector<Url> &urls, std::istream &is, bool regex_mode);
 
-bool is_number(const std::string &str);
+bool is_number(std::string_view str);
 
 inline char hex_digit(char c)
 {
